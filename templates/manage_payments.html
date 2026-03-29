@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>RIDE MATE | Payments</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        :root { --base-sage: #c7d5c1; --mid-sage: #9caf88; --deep-sage: #2f4f4f; --accent-cream: #f4f1de; --primary-main: {{ '#b56576' if is_women_only else '#2f4f4f' }}; --secondary-main: {{ '#e5989b' if is_women_only else '#9caf88' }}; --bg-main: {{ '#f4e9e9' if is_women_only else '#c7d5c1' }}; --nav-active: rgba(255, 255, 255, 0.4); }
+        body { background-color: var(--bg-main) !important; margin: 0; font-family: 'Inter', sans-serif; display: flex; min-height: 100vh; }
+        .sidebar-wrapper { width: 280px; background: var(--secondary-main) !important; height: 100vh; position: fixed; left: 0; top: 0; display: flex; flex-direction: column; padding: 40px 20px; box-sizing: border-box; z-index: 9999; box-shadow: 4px 0 15px rgba(0,0,0,0.05); }
+        .sidebar-wrapper h2 { color: var(--deep-sage); font-size: 26px; font-weight: 900; margin-bottom: 50px; text-align: center; letter-spacing: -1px; }
+        .sidebar-wrapper a { color: var(--deep-sage) !important; text-decoration: none; padding: 15px 20px; margin-bottom: 10px; border-radius: 15px; font-weight: 700; transition: all 0.3s ease; display: block; }
+        .sidebar-wrapper a:hover, .sidebar-wrapper a.active { background: var(--nav-active); color: var(--primary-main) !important; padding-left: 30px; }
+        .main-content { margin-left: 280px; padding: 40px; width: calc(100% - 280px); box-sizing: border-box; }
+        .glass-card { background: rgba(255, 255, 255, 0.4) !important; backdrop-filter: blur(10px); border-radius: 25px; padding: 25px; border: 1px solid rgba(255,255,255,0.3); margin-bottom: 30px; }
+        .btn-action { background: var(--primary-main); color: white; border: none; padding: 12px 25px; border-radius: 12px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .btn-action:hover { transform: translateY(-2px); }
+        .transaction-list { max-height: 400px; overflow-y: auto; padding-right: 10px; }
+        .transaction-list::-webkit-scrollbar { width: 6px; }
+        .transaction-list::-webkit-scrollbar-thumb { background: var(--secondary-main); border-radius: 10px; }
+    </style>
+</head>
+<body>
+    <div class="sidebar-wrapper">
+        <h2>RIDE MATE</h2>
+        <a href="/dashboard">🌿 Dashboard</a>
+        <a href="/offer_ride">🚗 Offer a Ride</a>
+        <a href="/ride_history">📜 Ride History</a>
+        <a href="/manage_payments" class="active">💳 Payments</a>
+        <a href="/live_tracking/1">📍 Live Tracking</a>
+        <a href="/support">🎧 Support</a>
+        <a href="/logout" style="margin-top: auto; color: #dc2626 !important;">🚪 Logout</a>
+    </div>
+
+    <div class="main-content">
+        <h1 style="color: var(--primary-main); font-weight: 900; margin-bottom: 30px;">Eco-Wallet 💳</h1>
+        <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 30px;">
+            <div class="glass-card" style="background: var(--primary-main) !important; color: white; text-align: center; padding: 40px 20px; height: fit-content;">
+                <h3 style="margin: 0; opacity: 0.8; font-weight: 500;">Current Balance</h3>
+                <h1 style="font-size: 3.5rem; margin: 10px 0;">₹{{ wallet_balance }}</h1>
+                <div style="display: flex; gap: 10px; justify-content: center; margin-top: 20px;">
+                    <button class="btn-action" style="background: white; color: var(--primary-main);">+ Add Funds</button>
+                    <button class="btn-action" style="background: rgba(0,0,0,0.2);">Withdraw</button>
+                </div>
+            </div>
+
+            <div class="glass-card">
+                <h3 style="color: var(--primary-main); margin-top: 0; border-bottom: 2px solid rgba(0,0,0,0.1); padding-bottom: 10px;">Recent Transactions</h3>
+                <div class="transaction-list">
+                    {% for txn in transactions %}
+                    <div style="display: flex; justify-content: space-between; padding: 15px 0; border-bottom: 1px solid rgba(0,0,0,0.05);">
+                        <div>
+                            <strong style="color: var(--deep-sage);">{{ txn.description }}</strong>
+                            <div style="font-size: 13px; color: #666; margin-top: 5px;">{{ txn.date }}</div>
+                        </div>
+                        {% if txn.type == 'credit' %}
+                        <strong style="color: #059669; font-size: 1.1rem;">+ ₹{{ txn.amount }}</strong>
+                        {% else %}
+                        <strong style="color: #ef4444; font-size: 1.1rem;">- ₹{{ txn.amount }}</strong>
+                        {% endif %}
+                    </div>
+                    {% else %}
+                    <div style="text-align: center; padding: 40px 0; color: #666;">
+                        <p>No transactions yet.</p>
+                        <p style="font-size: 0.9rem; opacity: 0.7;">Book or offer a ride to see activity here!</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

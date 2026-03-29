@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>RIDE MATE | Ride History</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        :root { --base-sage: #c7d5c1; --mid-sage: #9caf88; --deep-sage: #2f4f4f; --accent-cream: #f4f1de; --primary-main: {{ '#b56576' if is_women_only else '#2f4f4f' }}; --secondary-main: {{ '#e5989b' if is_women_only else '#9caf88' }}; --bg-main: {{ '#f4e9e9' if is_women_only else '#c7d5c1' }}; --nav-active: rgba(255, 255, 255, 0.4); }
+        body { background-color: var(--bg-main) !important; margin: 0; padding: 0; font-family: 'Inter', sans-serif; display: flex; min-height: 100vh; }
+        .sidebar-wrapper { width: 280px; background: var(--secondary-main) !important; height: 100vh; position: fixed; left: 0; top: 0; display: flex; flex-direction: column; padding: 40px 20px; box-sizing: border-box; z-index: 9999; box-shadow: 4px 0 15px rgba(0,0,0,0.05); }
+        .sidebar-wrapper h2 { color: var(--deep-sage); font-size: 26px; font-weight: 900; margin-bottom: 50px; text-align: center; letter-spacing: -1px; }
+        .sidebar-wrapper a { color: var(--deep-sage) !important; text-decoration: none; padding: 15px 20px; margin-bottom: 10px; border-radius: 15px; font-weight: 700; transition: all 0.3s ease; display: block; }
+        .sidebar-wrapper a:hover, .sidebar-wrapper a.active { background: var(--nav-active); color: var(--primary-main) !important; padding-left: 30px; }
+        .main-content { margin-left: 280px; padding: 40px; width: calc(100% - 280px); box-sizing: border-box; }
+        .glass-card { background: rgba(255, 255, 255, 0.4) !important; backdrop-filter: blur(10px); border-radius: 25px; padding: 25px; border: 1px solid rgba(255,255,255,0.3); margin-bottom: 30px; }
+        .history-badge { padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: bold; text-transform: uppercase; }
+        .badge-driver { background: #d1fae5; color: #065f46; }
+        .badge-passenger { background: #fce7f3; color: #9d174d; }
+    </style>
+</head>
+<body>
+    <div class="sidebar-wrapper">
+        <h2>RIDE MATE</h2>
+        <a href="/dashboard">🌿 Dashboard</a>
+        <a href="/offer_ride">🚗 Offer a Ride</a>
+        <a href="/ride_history" class="active">📜 Ride History</a>
+        <a href="/manage_payments">💳 Payments</a>
+        <a href="/live_tracking/1">📍 Live Tracking</a>
+        <a href="/support">🎧 Support</a>
+        <a href="/logout" style="margin-top: auto; color: #dc2626 !important;">🚪 Logout</a>
+    </div>
+
+    <div class="main-content">
+        <h1 style="color: var(--primary-main); font-weight: 900; margin-bottom: 30px;">Your Journey Log 📜</h1>
+
+        <h2 style="color: var(--primary-main); font-size: 1.5rem; margin-bottom: 20px;">🎟️ Booked as Passenger</h2>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px; margin-bottom: 40px;">
+            {% for ride, driver, b_id in booked_rides %}
+            <div class="glass-card" style="margin: 0; background: white !important;">
+                <span class="history-badge badge-passenger">Passenger</span>
+                <h3 style="margin: 15px 0 10px 0; color: var(--deep-sage);">{{ ride.route_from }} → {{ ride.route_to }}</h3>
+                <p style="font-size: 14px; color: #666;">👤 <b>Driver:</b> {{ driver.name }}</p>
+                <p style="font-size: 14px; color: #666;">📅 <b>Date:</b> {{ ride.departure_time }}</p>
+                <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #eee; display: flex; justify-content: space-between; align-items: center;">
+                    <span style="color: #059669; font-weight: bold;">Confirmed ✅</span>
+                    <a href="/live_tracking/{{ ride.id }}" style="color: var(--primary-main); font-weight: bold; text-decoration: none;">View Map →</a>
+                </div>
+            </div>
+            {% else %}
+            <p style="opacity: 0.6; color: var(--deep-sage);">You haven't booked any rides yet.</p>
+            {% endfor %}
+        </div>
+
+        <h2 style="color: var(--primary-main); font-size: 1.5rem; margin-bottom: 20px;">🚗 Offered as Driver</h2>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px;">
+            {% for ride in offered_rides %}
+            <div class="glass-card" style="margin: 0; background: white !important;">
+                <span class="history-badge badge-driver">Driver</span>
+                <h3 style="margin: 15px 0 10px 0; color: var(--deep-sage);">{{ ride.route_from }} → {{ ride.route_to }}</h3>
+                <p style="font-size: 14px; color: #666;">🚲 <b>Vehicle:</b> {{ ride.vehicle_type }}</p>
+                <p style="font-size: 14px; color: #666;">📅 <b>Date:</b> {{ ride.departure_time }}</p>
+                <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #eee; display: flex; justify-content: space-between; align-items: center;">
+                    <span style="color: #666;">Seats: <b>{{ ride.seats_available }}</b> left</span>
+                    <span style="color: var(--mid-sage); font-weight: bold;">Active Pool</span>
+                </div>
+            </div>
+            {% else %}
+            <p style="opacity: 0.6; color: var(--deep-sage);">You haven't offered any rides yet.</p>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>

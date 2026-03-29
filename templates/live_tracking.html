@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>RIDE MATE | Live Tracking</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css" />
+
+    <style>
+        :root { --base-sage: #c7d5c1; --mid-sage: #9caf88; --deep-sage: #2f4f4f; --accent-cream: #f4f1de; --primary-main: {{ '#b56576' if is_women_only else '#2f4f4f' }}; --secondary-main: {{ '#e5989b' if is_women_only else '#9caf88' }}; --bg-main: {{ '#f4e9e9' if is_women_only else '#c7d5c1' }}; --nav-active: rgba(255, 255, 255, 0.4); }
+        body { background-color: var(--bg-main) !important; margin: 0; font-family: 'Inter', sans-serif; display: flex; min-height: 100vh; }
+        .sidebar-wrapper { width: 280px; background: var(--secondary-main) !important; height: 100vh; position: fixed; left: 0; top: 0; display: flex; flex-direction: column; padding: 40px 20px; box-sizing: border-box; z-index: 9999; box-shadow: 4px 0 15px rgba(0,0,0,0.05); }
+        .sidebar-wrapper h2 { color: var(--deep-sage); font-size: 26px; font-weight: 900; margin-bottom: 50px; text-align: center; letter-spacing: -1px; }
+        .sidebar-wrapper a { color: var(--deep-sage) !important; text-decoration: none; padding: 15px 20px; margin-bottom: 10px; border-radius: 15px; font-weight: 700; transition: all 0.3s ease; display: block; }
+        .sidebar-wrapper a:hover, .sidebar-wrapper a.active { background: var(--nav-active); color: var(--primary-main) !important; padding-left: 30px; }
+        .main-content { margin-left: 280px; padding: 40px; width: calc(100% - 280px); box-sizing: border-box; }
+        .glass-card { background: rgba(255, 255, 255, 0.4) !important; backdrop-filter: blur(10px); border-radius: 25px; padding: 25px; border: 1px solid rgba(255,255,255,0.3); }
+    </style>
+</head>
+<body>
+    <div class="sidebar-wrapper">
+        <h2>RIDE MATE</h2>
+        <a href="/dashboard">🌿 Dashboard</a>
+        <a href="/offer_ride">🚗 Offer a Ride</a>
+        <a href="/ride_history">📜 Ride History</a>
+        <a href="/manage_payments">💳 Payments</a>
+        <a href="#" class="active">📍 Live Tracking</a>
+        <a href="/support">🎧 Support</a>
+        <a href="/logout" style="margin-top: auto; color: #dc2626 !important;">🚪 Logout</a>
+    </div>
+
+    <div class="main-content">
+        <h1 style="color: var(--primary-main); font-weight: 900; margin-bottom: 20px;">Live Route Tracking 📍</h1>
+        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 30px;">
+            
+            <div id="map" class="glass-card" style="padding: 0; overflow: hidden; height: 500px; width: 100%; position: relative;">
+                <p id="loading-text" style="color: #6b7280; font-weight: bold; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(255,255,255,0.9); padding: 15px 25px; border-radius: 10px; z-index: 1000;">Fetching GPS coordinates...</p>
+            </div>
+
+            <div class="glass-card">
+                <h3 style="color: var(--primary-main); margin-top: 0;">Ride Status</h3>
+                <div style="margin-bottom: 20px;">
+                    <span style="background: #d1fae5; color: #065f46; padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: bold;">En Route</span>
+                </div>
+                
+                <div style="margin-bottom: 15px;">
+                    <div style="font-size: 12px; color: #666; font-weight: bold; text-transform: uppercase;">Route</div>
+                    <div style="font-size: 16px; color: var(--deep-sage); font-weight: bold;">{{ ride.route_from }} ➡️ {{ ride.route_to }}</div>
+                </div>
+
+                <div style="margin-bottom: 15px;">
+                    <div style="font-size: 12px; color: #666; font-weight: bold; text-transform: uppercase;">Distance</div>
+                    <div id="dynamic-distance" style="font-size: 20px; color: var(--deep-sage); font-weight: bold;">Calculating...</div>
+                </div>
+
+                <div style="margin-bottom: 15px;">
+                    <div style="font-size: 12px; color: #666; font-weight: bold; text-transform: uppercase;">Estimated Time</div>
+                    <div id="dynamic-eta" style="font-size: 24px; color: var(--primary-main); font-weight: 900;">Calculating...</div>
+                </div>
+                
+                <button style="background: #ef4444; color: white; border: none; padding: 12px; width: 100%; border-radius: 12px; font-weight: bold; cursor: pointer; margin-top: 20px; transition: 0.3s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">Share Live Location</button>
+                
+                <a href="/end_ride/{{ ride.id }}" style="display: block; text-align: center; background: var(--deep-sage); color: white; text-decoration: none; padding: 12px; width: 100%; box-sizing: border-box; border-radius: 12px; font-weight: bold; margin-top: 10px; transition: 0.3s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">End Ride & Review ⭐️</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var startLocationName = "{{ ride.route_from }}";
+            var endLocationName = "{{ ride.route_to }}";
+            var loadingText = document.getElementById('loading-text');
+
+            // Initialize Map
+            var map = L.map('map').setView([12.9165, 79.1325], 7); 
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap'
+            }).addTo(map);
+
+            // Function to fetch coordinates from Nominatim API directly
+            async function getCoordinates(locationQuery) {
+                try {
+                    let response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(locationQuery)}`);
+                    let data = await response.json();
+                    if (data && data.length > 0) {
+                        return { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) };
+                    }
+                } catch (error) {
+                    console.error("Error fetching GPS:", error);
+                }
+                return null;
+            }
+
+            // Main function to draw map
+            async function drawRoute() {
+                let startCoords = await getCoordinates(startLocationName);
+                if (!startCoords) {
+                    loadingText.innerText = "⚠️ Could not find start point: " + startLocationName;
+                    return;
+                }
+
+                let endCoords = await getCoordinates(endLocationName);
+                if (!endCoords) {
+                    loadingText.innerText = "⚠️ Could not find destination: " + endLocationName;
+                    return;
+                }
+
+                // Both coordinates found, hide loading text!
+                loadingText.style.display = 'none';
+
+                // Add Routing Control
+                var routingControl = L.Routing.control({
+                    waypoints: [
+                        L.latLng(startCoords.lat, startCoords.lng),
+                        L.latLng(endCoords.lat, endCoords.lng)
+                    ],
+                    routeWhileDragging: false,
+                    show: false, // Hides the annoying turn-by-turn text box on map
+                    addWaypoints: false,
+                    draggableWaypoints: false,
+                    fitSelectedRoutes: true,
+                    lineOptions: {
+                        styles: [{ color: '#2f4f4f', weight: 5 }]
+                    }
+                }).addTo(map);
+
+                // Wait for route to calculate, then update Distance & ETA
+                routingControl.on('routesfound', function(e) {
+                    var summary = e.routes[0].summary;
+                    
+                    var distanceKm = (summary.totalDistance / 1000).toFixed(1);
+                    var totalMinutes = Math.round(summary.totalTime / 60);
+                    var hours = Math.floor(totalMinutes / 60);
+                    var minutes = totalMinutes % 60;
+                    
+                    var timeString = hours > 0 ? `${hours} hr ${minutes} mins` : `${minutes} mins`;
+
+                    document.getElementById('dynamic-distance').innerText = distanceKm + " km";
+                    document.getElementById('dynamic-eta').innerText = timeString;
+                });
+
+                // Catch routing errors (e.g., trying to drive across an ocean)
+                routingControl.on('routingerror', function(e) {
+                    document.getElementById('dynamic-distance').innerText = "Route not found";
+                    document.getElementById('dynamic-eta').innerText = "Route not found";
+                });
+            }
+
+            // Run the magic
+            drawRoute();
+        });
+    </script>
+</body>
+</html>

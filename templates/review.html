@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>RIDE MATE | Review</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        :root { --base-sage: #c7d5c1; --mid-sage: #9caf88; --deep-sage: #2f4f4f; --accent-cream: #f4f1de; --primary-main: {{ '#b56576' if session.get('is_women_only') else '#2f4f4f' }}; --secondary-main: {{ '#e5989b' if session.get('is_women_only') else '#9caf88' }}; --bg-main: {{ '#f4e9e9' if session.get('is_women_only') else '#c7d5c1' }}; --nav-active: rgba(255, 255, 255, 0.4); }
+        body { background-color: var(--bg-main) !important; margin: 0; font-family: 'Inter', sans-serif; display: flex; min-height: 100vh; align-items: center; justify-content: center; }
+        .glass-card { background: rgba(255, 255, 255, 0.6) !important; backdrop-filter: blur(10px); border-radius: 25px; padding: 40px; border: 1px solid rgba(255,255,255,0.3); width: 100%; max-width: 500px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .rating-container { display: flex; flex-direction: row-reverse; justify-content: center; margin: 20px 0; }
+        .rating-container input { display: none; }
+        .rating-container label { font-size: 40px; color: #ccc; cursor: pointer; transition: 0.2s; }
+        .rating-container input:checked ~ label, .rating-container label:hover, .rating-container label:hover ~ label { color: #fbbf24; }
+        textarea { width: 100%; height: 100px; border-radius: 12px; border: 1px solid #ccc; padding: 15px; box-sizing: border-box; font-family: inherit; margin-bottom: 20px; resize: none; }
+        .btn-submit { background: var(--primary-main); color: white; border: none; padding: 15px; width: 100%; border-radius: 12px; font-weight: bold; cursor: pointer; font-size: 16px; transition: 0.3s; }
+        .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+    </style>
+</head>
+<body>
+    <div class="glass-card">
+        <h1 style="color: var(--primary-main); margin-top: 0;">Ride Completed! 🎉</h1>
+        <p style="color: #666; margin-bottom: 30px;">How was your trip from <b>{{ ride.route_from }}</b> to <b>{{ ride.route_to }}</b>?</p>
+        
+        <form action="/end_ride/{{ ride.id }}" method="POST">
+            
+            <div class="rating-container">
+                <input type="radio" id="star5" name="rating" value="5" required />
+                <label for="star5" title="5 stars">★</label>
+                <input type="radio" id="star4" name="rating" value="4" />
+                <label for="star4" title="4 stars">★</label>
+                <input type="radio" id="star3" name="rating" value="3" />
+                <label for="star3" title="3 stars">★</label>
+                <input type="radio" id="star2" name="rating" value="2" />
+                <label for="star2" title="2 stars">★</label>
+                <input type="radio" id="star1" name="rating" value="1" />
+                <label for="star1" title="1 star">★</label>
+            </div>
+
+            <textarea name="review_text" placeholder="Leave a comment about the passenger/driver (optional)..."></textarea>
+            
+            <button type="submit" class="btn-submit">Submit Review & Return to Dashboard</button>
+        </form>
+    </div>
+</body>
+</html>

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Welcome | Ride Mate</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        /* Ensuring the landing page follows the Auth Page structure */
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: #e0eadd; /* Sage Green background to match Dashboard */
+            margin: 0;
+        }
+
+        .auth-container {
+            width: 450px;
+            text-align: center;
+            padding: 50px 40px;
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(15px);
+            border-radius: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+        }
+
+        .auth-container h1 {
+            color: #2f6f62;
+            font-size: 32px;
+            margin-bottom: 10px;
+            font-weight: 800;
+        }
+
+        .auth-container p {
+            color: #64748b;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .btn-landing {
+            padding: 15px;
+            border-radius: 15px;
+            text-decoration: none;
+            font-weight: 700;
+            transition: 0.3s;
+        }
+
+        .btn-primary {
+            background: #2f6f62;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #2f6f62;
+            border: 2px solid #2f6f62;
+        }
+
+        .btn-landing:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .eco-badge {
+            display: inline-block;
+            background: #d1fae5;
+            color: #065f46;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="auth-container">
+    <div class="eco-badge">☘️ Eco-Friendly Commuting</div>
+    <h1>Ride Mate</h1>
+    <p>Reduce your carbon footprint and save costs. Connect with verified riders for a safer, smarter commute.</p>
+    
+    <div class="btn-group">
+        <a href="/login" class="btn-landing btn-primary">Login to Account</a>
+        <a href="/register" class="btn-landing btn-secondary">Create New Account</a>
+    </div>
+
+    <div style="margin-top: 30px; font-size: 14px; color: #94a3b8;">
+        Join 5,000+ students and professionals today.
+    </div>
+</div>
+
+</body>
+</html>

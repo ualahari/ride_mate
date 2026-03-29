@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>RIDE MATE | Offer a Ride</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        :root { --base-sage: #c7d5c1; --mid-sage: #9caf88; --deep-sage: #2f4f4f; --accent-cream: #f4f1de; --primary-main: {{ '#b56576' if is_women_only else '#2f4f4f' }}; --secondary-main: {{ '#e5989b' if is_women_only else '#9caf88' }}; --bg-main: {{ '#f4e9e9' if is_women_only else '#c7d5c1' }}; --nav-active: rgba(255, 255, 255, 0.4); }
+        body { background-color: var(--bg-main) !important; margin: 0; font-family: 'Inter', sans-serif; display: flex; min-height: 100vh; }
+        .sidebar-wrapper { width: 280px; background: var(--secondary-main) !important; height: 100vh; position: fixed; left: 0; top: 0; display: flex; flex-direction: column; padding: 40px 20px; box-sizing: border-box; z-index: 9999; box-shadow: 4px 0 15px rgba(0,0,0,0.05); }
+        .sidebar-wrapper h2 { color: var(--deep-sage); font-size: 26px; font-weight: 900; margin-bottom: 50px; text-align: center; letter-spacing: -1px; }
+        .sidebar-wrapper a { color: var(--deep-sage) !important; text-decoration: none; padding: 15px 20px; margin-bottom: 10px; border-radius: 15px; font-weight: 700; transition: all 0.3s ease; display: block; }
+        .sidebar-wrapper a:hover, .sidebar-wrapper a.active { background: var(--nav-active); color: var(--primary-main) !important; padding-left: 30px; }
+        .main-content { margin-left: 280px; padding: 40px; width: calc(100% - 280px); box-sizing: border-box; }
+        .glass-card { background: rgba(255, 255, 255, 0.4) !important; backdrop-filter: blur(10px); border-radius: 25px; padding: 35px; border: 1px solid rgba(255,255,255,0.3); margin-bottom: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); max-width: 800px; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; font-weight: bold; margin-bottom: 8px; color: var(--deep-sage); }
+        .form-control { width: 100%; padding: 14px; border-radius: 12px; border: 1px solid rgba(0,0,0,0.1); background: rgba(255,255,255,0.7); font-size: 1rem; outline: none; box-sizing: border-box; transition: 0.3s; }
+        .form-control:focus { border-color: var(--primary-main); background: white; }
+        .btn-action { background: var(--primary-main); color: white; border: none; padding: 15px 30px; border-radius: 12px; font-weight: bold; font-size: 1.1rem; cursor: pointer; transition: 0.3s; width: 100%; }
+        .btn-action:hover { transform: translateY(-2px); filter: brightness(1.1); box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
+        
+        /* New styling for the checkbox wrapper */
+        .checkbox-wrapper { display: flex; align-items: center; gap: 12px; background: rgba(255,255,255,0.6); padding: 15px; border-radius: 12px; border: 1px solid rgba(0,0,0,0.1); cursor: pointer; margin-bottom: 25px; transition: 0.3s; }
+        .checkbox-wrapper:hover { background: white; border-color: var(--primary-main); }
+    </style>
+</head>
+<body>
+    <div class="sidebar-wrapper">
+        <h2>RIDE MATE</h2>
+        <a href="/dashboard">🌿 Dashboard</a>
+        <a href="/offer_ride" class="active">🚗 Offer a Ride</a>
+        <a href="/ride_history">📜 Ride History</a>
+        <a href="/manage_payments">💳 Payments</a>
+        <a href="/live_tracking/1">📍 Live Tracking</a>
+        <a href="/support">🎧 Support</a>
+        <a href="/logout" style="margin-top: auto; color: #dc2626 !important;">🚪 Logout</a>
+    </div>
+
+    <div class="main-content">
+        <h1 style="color: var(--primary-main); font-weight: 900; margin-bottom: 10px;">Share your Journey 🌱</h1>
+        <p style="color: var(--deep-sage); opacity: 0.8; margin-bottom: 30px;">Help reduce carbon emissions and split travel costs.</p>
+
+        <div class="glass-card">
+            <form action="/offer_ride" method="POST">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div class="form-group"><label>Starting Point</label><input type="text" name="route_from" class="form-control" placeholder="e.g. Vellore Institute" required></div>
+                    <div class="form-group"><label>Destination</label><input type="text" name="route_to" class="form-control" placeholder="e.g. Chennai Airport" required></div>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px;">
+                    <div class="form-group"><label>Departure Time</label><input type="datetime-local" name="departure_time" class="form-control" required></div>
+                    <div class="form-group"><label>Vehicle Type</label><select name="vehicle_type" class="form-control" required><option value="Car">🚗 Car</option><option value="Bike">🏍️ Bike</option></select></div>
+                    <div class="form-group"><label>Available Seats</label><input type="number" name="seats_available" class="form-control" min="1" max="6" value="1" required></div>
+                </div>
+
+                <label class="checkbox-wrapper">
+                    <input type="checkbox" name="is_women_only" value="true" style="width: 20px; height: 20px; accent-color: var(--primary-main);">
+                    <span style="font-weight: bold; color: var(--primary-main); font-size: 1.1rem;">🌸 Make this a Women-Only Ride</span>
+                </label>
+
+                <button type="submit" class="btn-action">Publish Ride</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Booking Confirmed | Smart Pool</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .confirmation-card {
+            max-width: 500px;
+            margin: 50px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .driver-info {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            border: 1px solid #e2e8f0;
+            text-align: left;
+        }
+        .badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            background: #dcfce7;
+            color: #166534;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body style="background-color: #f1f5f9; font-family: 'Segoe UI', sans-serif;">
+
+<div class="confirmation-card">
+    <div style="font-size: 50px;">✅</div>
+    <h2 style="color: #2f6f62;">Booking Confirmed!</h2>
+    <p style="color: #64748b;">Your ride from <strong>{{ ride.route_from }}</strong> to <strong>{{ ride.route_to }}</strong> is scheduled.</p>
+
+    <div class="driver-info">
+        <span class="badge">{{ ride.vehicle_type }} Pool</span>
+        <p style="margin: 8px 0;">👤 <strong>Driver:</strong> {{ driver.name }}</p>
+        <p style="margin: 8px 0;">📞 <strong>Contact:</strong> +91 98XXX XXXXX</p>
+        <p style="margin: 8px 0;">🕒 <strong>Departure:</strong> {{ ride.departure_time }}</p>
+        
+        {% if ride.vehicle_type == 'Bike' %}
+        <div style="margin-top: 15px; padding: 10px; background: #fff1f2; border-radius: 10px; border: 1px solid #fecdd3; color: #be123c;">
+            🪖 <strong>Helmet Requirement:</strong> {{ ride.helmet_status }}
+        </div>
+        {% endif %}
+    </div>
+
+    <div style="display: flex; gap: 10px;">
+        <a href="/dashboard" style="flex: 1; padding: 12px; background: #2f6f62; color: white; text-decoration: none; border-radius: 10px; font-weight: bold;">Back to Dashboard</a>
+        <a href="/coming_soon/live_tracking" style="flex: 1; padding: 12px; border: 2px solid #2f6f62; color: #2f6f62; text-decoration: none; border-radius: 10px; font-weight: bold;">Track Ride</a>
+    </div>
+    
+    <p style="margin-top: 20px; font-size: 12px; color: #94a3b8;">Remember to verify the driver and vehicle before boarding.</p>
+</div>
+
+</body>
+</html>
